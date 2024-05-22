@@ -107,10 +107,19 @@ export default function Index() {
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
           <button
             type="button"
+            onClick={() => router.push("/transactions/reports")}
+            className="block rounded-md bg-yellow-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
+          >
+            Reports
+          </button>
+        </div>
+        <div className="mt-4 sm:ml-4 sm:mt-0 sm:flex-none">
+          <button
+            type="button"
             onClick={() => router.push("/transactions/create")}
             className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
-            Add transactions
+            Create transaction
           </button>
         </div>
       </div>
@@ -249,7 +258,19 @@ export default function Index() {
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Item Type
+                      <Link
+                        onClick={() => onSortBy("type")}
+                        href="#sortByType"
+                        className="group inline-flex"
+                      >
+                        Item Type
+                        <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible group-focus:visible">
+                          <ChevronDownIcon
+                            className="invisible ml-2 h-5 w-5 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
+                            aria-hidden="true"
+                          />
+                        </span>
+                      </Link>
                     </th>
                     <th
                       scope="col"
@@ -283,13 +304,13 @@ export default function Index() {
                             {item.itemType}
                           </td>
                           <td className="flex space-x-5  whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                            <Link
-                              href={`/transactions/${item.id}`}
-                              className="text-indigo-600 hover:text-indigo-900"
-                            >
-                              Edit
-                              <span className="sr-only">, {item.itemName}</span>
-                            </Link>
+                            {/* <Link */}
+                            {/*   href={`/transactions/${item.id}`} */}
+                            {/*   className="text-indigo-600 hover:text-indigo-900" */}
+                            {/* > */}
+                            {/*   Edit */}
+                            {/*   <span className="sr-only">, {item.itemName}</span> */}
+                            {/* </Link> */}
 
                             <button
                               className="text-red-600 hover:text-red-900"

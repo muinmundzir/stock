@@ -210,7 +210,19 @@ export default function Items() {
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Type
+                      <Link
+                        onClick={() => onSortBy("type")}
+                        href="#sortByType"
+                        className="group inline-flex"
+                      >
+                        Type
+                        <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible group-focus:visible">
+                          <ChevronDownIcon
+                            className="invisible ml-2 h-5 w-5 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
+                            aria-hidden="true"
+                          />
+                        </span>
+                      </Link>
                     </th>
                     <th
                       scope="col"
