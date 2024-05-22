@@ -291,18 +291,6 @@ export default function Items() {
           </div>
         </div>
       </div>
-      <button
-        onClick={() => onSortBy("sortByDate")}
-        id="sortByDate"
-        hidden
-        aria-hidden="true"
-      ></button>
-      <button
-        onClick={() => onSortBy("sortByName")}
-        id="sortByName"
-        hidden
-        aria-hidden="true"
-      ></button>
     </section>
   );
 }

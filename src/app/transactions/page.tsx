@@ -3,12 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import Link from "next/link";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 import { transactionType } from "@/types/transaction.type";
 import { formatDate } from "../helpers/format-date.helper";
 import { buildQueryString } from "../helpers/url-search-params.helper";
 import { useDebounce } from "../hooks/useDebounce.hook";
-import Link from "next/link";
+
+enum orderType {
+  ASC = "asc",
+  DESC = "desc",
+}
 
 export default function Index() {
   const notify = (message: any) => toast(message);
@@ -19,15 +25,20 @@ export default function Index() {
     startDate: "",
     endDate: "",
   });
+  const [order, setOrder] = useState<{ sortBy: string; order: orderType }>({
+    sortBy: "",
+    order: orderType.DESC,
+  });
 
   const debouncedFilters = useDebounce(filters, 1000);
 
   const fetchData = useCallback(() => {
     const queryString = buildQueryString(debouncedFilters);
+    const sortString = buildQueryString(order);
 
     const fetchData = async () => {
       const response = await fetch(
-        `http://localhost:3000/transactions?${queryString}`,
+        `http://localhost:3000/transactions?${queryString}&${sortString}`,
       );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -39,7 +50,7 @@ export default function Index() {
     fetchData().catch((error) => {
       notify(`An error occurred while fetching the data: ${error}`);
     });
-  }, [debouncedFilters]);
+  }, [debouncedFilters, order]);
 
   useEffect(() => {
     fetchData();
@@ -75,6 +86,13 @@ export default function Index() {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [name]: value,
+    }));
+  };
+
+  const onSortBy = (field: string) => {
+    setOrder((prevOrder) => ({
+      order: prevOrder.order === orderType.ASC ? orderType.DESC : orderType.ASC,
+      sortBy: field,
     }));
   };
 
@@ -159,25 +177,73 @@ export default function Index() {
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Item Name
+                      <Link
+                        onClick={() => onSortBy("name")}
+                        href="#sortByName"
+                        className="group inline-flex"
+                      >
+                        Item Name
+                        <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible group-focus:visible">
+                          <ChevronDownIcon
+                            className="invisible ml-2 h-5 w-5 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
+                            aria-hidden="true"
+                          />
+                        </span>
+                      </Link>
                     </th>
                     <th
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Stock
+                      <Link
+                        onClick={() => onSortBy("stockHistory")}
+                        href="#sortByStockHistory"
+                        className="group inline-flex"
+                      >
+                        Stock
+                        <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible group-focus:visible">
+                          <ChevronDownIcon
+                            className="invisible ml-2 h-5 w-5 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
+                            aria-hidden="true"
+                          />
+                        </span>
+                      </Link>
                     </th>
                     <th
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Sold Amount{" "}
+                      <Link
+                        onClick={() => onSortBy("amount")}
+                        href="#sortBySoldAmount"
+                        className="group inline-flex"
+                      >
+                        Sold Amount
+                        <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible group-focus:visible">
+                          <ChevronDownIcon
+                            className="invisible ml-2 h-5 w-5 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
+                            aria-hidden="true"
+                          />
+                        </span>
+                      </Link>
                     </th>
                     <th
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Transaction Date
+                      <Link
+                        onClick={() => onSortBy("transactionDate")}
+                        href="#sortByTransactionDate"
+                        className="group inline-flex"
+                      >
+                        Transaction Date
+                        <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible group-focus:visible">
+                          <ChevronDownIcon
+                            className="invisible ml-2 h-5 w-5 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
+                            aria-hidden="true"
+                          />
+                        </span>
+                      </Link>
                     </th>
                     <th
                       scope="col"
