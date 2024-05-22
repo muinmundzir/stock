@@ -30,6 +30,7 @@ export default function Edit({
   const notify = (message: any) => toast(message);
   const router = useRouter();
   const [form, setForm] = useState<formType>();
+  const [itemName, setItemName] = useState<string>("");
 
   const fetchData = useCallback(() => {
     const fetchData = async () => {
@@ -40,7 +41,8 @@ export default function Edit({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log(result, "result");
+
+      setItemName(result.name);
       setForm({
         name: result.name,
         stock: result.stock,
@@ -105,7 +107,7 @@ export default function Edit({
         <div className="space-y-12">
           <div className="border-b border-gray-900/10 pb-12">
             <h2 className="text-base font-semibold leading-7 text-gray-900">
-              Edit: {form?.name}
+              Edit: {itemName}
             </h2>
             <p className="mt-1 text-sm leading-6 text-gray-600">
               This information is about detail item that will be edited

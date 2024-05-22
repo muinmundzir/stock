@@ -2,12 +2,19 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "react-toastify";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 import { itemType } from "@/types/item.type";
 import { useDebounce } from "../hooks/useDebounce.hook";
 import { buildQueryString } from "../helpers/url-search-params.helper";
 import { formatDate } from "../helpers/format-date.helper";
+
+enum orderType {
+  ASC = "asc",
+  DESC = "desc",
+}
 
 export default function Items() {
   const notify = (message: any) => toast(message);
@@ -18,15 +25,20 @@ export default function Items() {
     startDate: "",
     endDate: "",
   });
+  const [order, setOrder] = useState<{ sortBy: string; order: orderType }>({
+    sortBy: "",
+    order: orderType.DESC,
+  });
 
   const debouncedFilters = useDebounce(filters, 1000);
 
   const fetchData = useCallback(() => {
     const queryString = buildQueryString(debouncedFilters);
+    const filterString = buildQueryString(order);
 
     const fetchData = async () => {
       const response = await fetch(
-        `http://localhost:3000/items?${queryString}`,
+        `http://localhost:3000/items?${queryString}&${filterString}`,
       );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -38,7 +50,7 @@ export default function Items() {
     fetchData().catch((error) => {
       notify(`An error occurred while fetching the data: ${error}`);
     });
-  }, [debouncedFilters]);
+  }, [debouncedFilters, order]);
 
   useEffect(() => {
     fetchData();
@@ -71,6 +83,13 @@ export default function Items() {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [name]: value,
+    }));
+  };
+
+  const onSortBy = (field: string) => {
+    setOrder((prevOrder) => ({
+      order: prevOrder.order === orderType.ASC ? orderType.DESC : orderType.ASC,
+      sortBy: field,
     }));
   };
 
@@ -155,13 +174,37 @@ export default function Items() {
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Name
+                      <Link
+                        onClick={() => onSortBy("name")}
+                        href="#sortByName"
+                        className="group inline-flex"
+                      >
+                        Name
+                        <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible group-focus:visible">
+                          <ChevronDownIcon
+                            className="invisible ml-2 h-5 w-5 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
+                            aria-hidden="true"
+                          />
+                        </span>
+                      </Link>
                     </th>
                     <th
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Stock
+                      <Link
+                        onClick={() => onSortBy("stock")}
+                        href="#sortByStock"
+                        className="group inline-flex"
+                      >
+                        Stock
+                        <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible group-focus:visible">
+                          <ChevronDownIcon
+                            className="invisible ml-2 h-5 w-5 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
+                            aria-hidden="true"
+                          />
+                        </span>
+                      </Link>
                     </th>
                     <th
                       scope="col"
@@ -173,7 +216,19 @@ export default function Items() {
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Created at
+                      <Link
+                        onClick={() => onSortBy("createdAt")}
+                        href="#sortByDate"
+                        className="group inline-flex"
+                      >
+                        Created at
+                        <span className="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible group-focus:visible">
+                          <ChevronDownIcon
+                            className="invisible ml-2 h-5 w-5 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
+                            aria-hidden="true"
+                          />
+                        </span>
+                      </Link>
                     </th>
                     <th
                       scope="col"
@@ -236,6 +291,18 @@ export default function Items() {
           </div>
         </div>
       </div>
+      <button
+        onClick={() => onSortBy("sortByDate")}
+        id="sortByDate"
+        hidden
+        aria-hidden="true"
+      ></button>
+      <button
+        onClick={() => onSortBy("sortByName")}
+        id="sortByName"
+        hidden
+        aria-hidden="true"
+      ></button>
     </section>
   );
 }
