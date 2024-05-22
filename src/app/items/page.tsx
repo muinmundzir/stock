@@ -5,15 +5,29 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
 import { itemType } from "@/types/item.type";
+import { useDebounce } from "../hooks/useDebounce.hook";
+import { buildQueryString } from "../helpers/url-search-params.helper";
+import { formatDate } from "../helpers/format-date.helper";
 
 export default function Items() {
   const notify = (message: any) => toast(message);
   const router = useRouter();
   const [items, setItems] = useState<itemType[]>([]);
+  const [filters, setFilters] = useState({
+    itemName: "",
+    startDate: "",
+    endDate: "",
+  });
+
+  const debouncedFilters = useDebounce(filters, 1000);
 
   const fetchData = useCallback(() => {
+    const queryString = buildQueryString(debouncedFilters);
+
     const fetchData = async () => {
-      const response = await fetch("http://localhost:3000/items");
+      const response = await fetch(
+        `http://localhost:3000/items?${queryString}`,
+      );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -24,7 +38,7 @@ export default function Items() {
     fetchData().catch((error) => {
       notify(`An error occurred while fetching the data: ${error}`);
     });
-  }, []);
+  }, [debouncedFilters]);
 
   useEffect(() => {
     fetchData();
@@ -51,6 +65,15 @@ export default function Items() {
     }
   };
 
+  const onChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const { name, value } = e.currentTarget;
+
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: value,
+    }));
+  };
+
   return (
     <section>
       <div className="sm:flex sm:items-center">
@@ -67,6 +90,52 @@ export default function Items() {
           >
             Add item
           </button>
+        </div>
+      </div>
+      <div className="mt-6 -my-4 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <label
+            htmlFor="itemName"
+            className="block text-sm font-medium  text-gray-900"
+          >
+            Search
+          </label>
+          <div>
+            <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+              <input
+                type="text"
+                name="itemName"
+                id="itemName"
+                className="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                placeholder="filter by item name"
+                onChange={onChange}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center space-x-4">
+          <span className="text-sm">From</span>
+          <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+            <input
+              type="date"
+              name="startDate"
+              id="startDate"
+              className="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+              placeholder="100"
+              onChange={onChange}
+            />
+          </div>
+          <span className="text-sm">to</span>
+          <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+            <input
+              type="date"
+              name="endDate"
+              id="endDate"
+              className="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+              placeholder="100"
+              onChange={onChange}
+            />
+          </div>
         </div>
       </div>
       <div className="mt-8 flow-root">
@@ -104,6 +173,12 @@ export default function Items() {
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
+                      Created at
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Action
                     </th>
                   </tr>
@@ -124,6 +199,9 @@ export default function Items() {
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             {item.type}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {formatDate(item.createdAt)}
                           </td>
                           <td className="flex space-x-5  whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                             <button
